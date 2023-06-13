@@ -192,7 +192,7 @@
         const text = document.querySelector('#input-split').value
         try {
           const parts = Strip(pattern, text)
-          document.querySelector('#input-pattern').color = 'white'
+          document.querySelector('#input-pattern').style.color = 'white'
           data.matches = parts[0]
           data.strings = parts[1]
           document.querySelector('#input-merge').value = ''
@@ -201,7 +201,7 @@
           document.querySelector('#output-post').value = parts[1].join('\n')
         } catch (e) {
           console.error(e)
-          document.querySelector('#input-pattern').color = 'red'
+          document.querySelector('#input-pattern').style.color = 'red'
         }
       }
 
