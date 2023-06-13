@@ -190,13 +190,19 @@
       function SplitText () {
         const pattern = document.querySelector('#input-pattern').textContent
         const text = document.querySelector('#input-split').value
-        const parts = Strip(pattern, text)
-        data.matches = parts[0]
-        data.strings = parts[1]
-        document.querySelector('#input-merge').value = ''
-        document.querySelector('#output').value = ''
-        document.querySelector('#output-pre').value = parts[0].join('\n')
-        document.querySelector('#output-post').value = parts[1].join('\n')
+        try {
+          const parts = Strip(pattern, text)
+          document.querySelector('#input-pattern').color = 'white'
+          data.matches = parts[0]
+          data.strings = parts[1]
+          document.querySelector('#input-merge').value = ''
+          document.querySelector('#output').value = ''
+          document.querySelector('#output-pre').value = parts[0].join('\n')
+          document.querySelector('#output-post').value = parts[1].join('\n')
+        } catch (e) {
+          console.error(e)
+          document.querySelector('#input-pattern').color = 'red'
+        }
       }
 
       function Clear () {
@@ -218,6 +224,13 @@
           document.querySelector('#input-merge').addEventListener(evt, MergeText)
         })
         document.querySelector('#cancel').parentElement.addEventListener('click', Clear)
+        Clear()
+        if (window.location.search) {
+          const params = new URLSearchParams(window.location.search)          
+          if (params.p && params.p.length > 0) {
+            document.querySelector('#input-pattern').textContent = params.p
+          }
+        }
       }
 
       Setup()
