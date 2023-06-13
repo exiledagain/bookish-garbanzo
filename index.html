@@ -107,7 +107,7 @@
         escaped: true
       }
 
-      let data = {        
+      let data = {
       }
 
       function * EachLine (strings) {
@@ -118,10 +118,7 @@
           yield line
           index = match.index + match.length
         }
-        if (index < strings.length) {
-          const line = strings.substring(index)
-          yield strings.substring(index)
-        }
+        yield strings.substring(index)
       }
 
       function LineCount (string) {
@@ -180,8 +177,18 @@
         }
         return merged
       }
+      console.log(Merge([
+        '123',
+        '123'
+      ], [
+        'a\n',
+        'b'
+      ], 'q\nw\ne'))
 
       function MergeText () {
+        if (!data.matches || !data.strings) {
+          return
+        }
         const merged = Merge(data.matches, data.strings, document.querySelector('#input-merge').value)
         const text = merged.join('\n')
         document.querySelector('#output').value = text
@@ -192,7 +199,7 @@
         const text = document.querySelector('#input-split').value
         try {
           const parts = Strip(pattern, text)
-          document.querySelector('#input-pattern').style.color = 'white'
+          document.querySelector('#input-pattern').style.color = 'silver'
           data.matches = parts[0]
           data.strings = parts[1]
           document.querySelector('#input-merge').value = ''
@@ -206,6 +213,7 @@
       }
 
       function Clear () {
+        data = {}
         document.querySelector('#output').value = ''
         document.querySelector('#output-pre').value = ''
         document.querySelector('#output-post').value = ''
