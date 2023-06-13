@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf8">
+    <title>Prepend Stripper</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <style>
+      body {
+        background-color: rgb(23, 39, 63);
+        color: silver;
+        font-family: 'Noto Sans JP', sans-serif;
+      }
+
+      .self-center {
+        margin: auto;
+        max-width: 1300px;
+        width: 95%;
+      }
+
+      .centered-items {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 3em;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      .io {
+        color: inherit;
+        background-color: inherit;
+        font-family: inherit;
+        height: 10em;
+        resize: none;
+        outline: none;
+        font-size: larger;
+        box-sizing: border-box;
+        border: none;
+        position: relative;
+      }
+
+      .full-io {
+        width: 100%;
+      }
+
+      .half-io {
+        width: 45%;
+      }
+
+      .fixed-io {
+        width: 95%;
+        border: 2px silver solid;
+        padding: 8px 8px 8px 8px;
+      }
+
+      [contenteditable=true]:empty:before {
+        content:attr(data-ph);
+        color:grey;
+        pointer-events: none;
+      }
+
+      .hidden {
+        opacity: 0;
+      }
+
+      .cancel {
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .minor-gap {
+        margin-bottom: -2em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="self-center centered-items">
+      <div class="minor-gap">
+        <span class="text-center">Prepend Stripper</span>
+      </div>
+      <div class="minor-gap">
+        <span id="cancel" class="cancel">🗑️</span>
+      </div>
+      <div class="fixed-io" id="input-pattern" contenteditable="true" data-ph="Type pattern here"></div>
+      <div class="fixed-io">
+        <textarea id="input-split" class="io full-io" placeholder="Type text here"></textarea>
+      </div>
+      <div class="fixed-io">
+        <textarea id="output-pre" class="io half-io" placeholder="Prepended text here..." readonly></textarea>
+        <textarea id="output-post" class="io half-io" placeholder="Text here..." readonly></textarea>
+      </div>
+      <div class="fixed-io">
+        <textarea id="input-merge" class="io full-io" placeholder="Type text here"></textarea>
+      </div>
+      <div class="fixed-io">
+        <textarea id="output" class="io full-io" placeholder="Enter text above..." readonly></textarea>
+      </div>
+    </div>
+    <script>
+      window.opts = {
+        ignoreCase: true,
+        escaped: true
+      }
+
+      let data = {        
+      }
+
+      function * EachLine (strings) {
+        const regex = /(?:\r?\n)/g
+        let index = 0
+        for (const match of strings.matchAll(regex)) {
+          const line = strings.substring(index, match.index)
+          yield line
+          index = match.index + match.length
+        }
+        if (index < strings.length) {
+          const line = strings.substring(index)
+          yield strings.substring(index)
+        }
+      }
+
+      function LineCount (string) {
+        let count = 0
+        for (const line of EachLine(string)) {
+          count += 1
+        }
+        return count
+      }
+
+      function Strip (pattern, input, opts = window.opts) {
+        const regex = new RegExp(`^${pattern}`, opts.ignoreCase ? 'i' : '')
+        const matches = []
+        const strings = []
+        for (let line of EachLine(input)) {
+          if (line.length === 0) {
+            continue
+          }
+          line = line.trimEnd().normalize()
+          const match = regex.exec(line)
+          matches.push(match ? match[0] : '')
+          const processedLine = line.replace(regex, '')
+          if (opts.escaped) {
+            strings.push(JSON.parse(`"${processedLine}"`))
+          } else {
+            strings.push(processedLine)
+          }
+        }
+        return [matches, strings]
+      }
+
+      function Merge (matches, sources, input, opts = window.opts) {
+        const strings = []
+        for (let line of EachLine(input)) {
+          if (line.length === 0) {
+            continue
+          }
+          strings.push(line)
+        }
+        const merged = []
+        for (let i = 0, k = 0; k < sources.length; ++i, ++k) {
+          if (i < strings.length) {
+            if (opts.escaped) {
+              const lines = []
+              for (let j = 0, n = LineCount(sources[k]); j < n && i < strings.length; ++j, ++i) {
+                lines.push(strings[i])
+              }
+              i -= 1
+              merged.push(`${matches[k]}${lines.join('\\n')}`)
+            } else {
+              merged.push(`${matches[k]}${strings[i]}`)
+            }
+          } else {
+            merged.push(matches[k])
+          }
+        }
+        return merged
+      }
+
+      function MergeText () {
+        const merged = Merge(data.matches, data.strings, document.querySelector('#input-merge').value)
+        const text = merged.join('\n')
+        document.querySelector('#output').value = text
+      }
+
+      function SplitText () {
+        const pattern = document.querySelector('#input-pattern').textContent
+        const text = document.querySelector('#input-split').value
+        const parts = Strip(pattern, text)
+        data.matches = parts[0]
+        data.strings = parts[1]
+        document.querySelector('#input-merge').value = ''
+        document.querySelector('#output').value = ''
+        document.querySelector('#output-pre').value = parts[0].join('\n')
+        document.querySelector('#output-post').value = parts[1].join('\n')
+      }
+
+      function Clear () {
+        document.querySelector('#output').value = ''
+        document.querySelector('#output-pre').value = ''
+        document.querySelector('#output-post').value = ''
+        document.querySelector('#input-merge').value = ''
+        document.querySelector('#input-split').value = ''
+        document.querySelector('#input-pattern').textContent = ''
+      }
+
+      function Setup () {
+        const events = ['change','input']
+        events.forEach(evt => {
+          document.querySelector('#input-pattern').addEventListener(evt, SplitText)
+          document.querySelector('#input-split').addEventListener(evt, SplitText)
+        })
+        events.forEach(evt => {
+          document.querySelector('#input-merge').addEventListener(evt, MergeText)
+        })
+        document.querySelector('#cancel').parentElement.addEventListener('click', Clear)
+      }
+
+      Setup()
+    </script>
+  </body>
+</html>
