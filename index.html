@@ -235,8 +235,8 @@
         Clear()
         if (window.location.search) {
           const params = new URLSearchParams(window.location.search)          
-          if (params.p && params.p.length > 0) {
-            document.querySelector('#input-pattern').textContent = params.p
+          if (params.has('p') && params.get('p').length > 0) {
+            document.querySelector('#input-pattern').textContent = params.get('p')
           }
         }
       }
