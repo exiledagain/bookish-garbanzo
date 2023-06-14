@@ -159,17 +159,17 @@
           strings.push(line)
         }
         const merged = []
-        for (let i = 0, k = 0; k < sources.length; ++i, ++k) {
+        for (let i = 0, k = 0; k < sources.length; ++k) {
           if (i < strings.length) {
             if (opts.escaped) {
               const lines = []
               for (let j = 0, n = LineCount(sources[k]); j < n && i < strings.length; ++j, ++i) {
                 lines.push(strings[i])
               }
-              i -= 1
               merged.push(`${matches[k]}${lines.join('\\n')}`)
             } else {
               merged.push(`${matches[k]}${strings[i]}`)
+              i += 1
             }
           } else {
             merged.push(matches[k])
