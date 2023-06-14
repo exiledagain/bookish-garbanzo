@@ -153,9 +153,6 @@
       function Merge (matches, sources, input, opts = window.opts) {
         const strings = []
         for (let line of EachLine(input)) {
-          if (line.length === 0) {
-            continue
-          }
           strings.push(line)
         }
         const merged = []
@@ -190,6 +187,9 @@
       function SplitText () {
         const pattern = document.querySelector('#input-pattern').textContent
         const text = document.querySelector('#input-split').value
+        const params = new URLSearchParams(window.location.search)
+        params.set('p', encodeURIComponent(pattern))
+        window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}${window.location.hash}`)
         try {
           const parts = Strip(pattern, text)
           document.querySelector('#input-pattern').style.color = 'silver'
@@ -229,7 +229,7 @@
         if (window.location.search) {
           const params = new URLSearchParams(window.location.search)          
           if (params.has('p') && params.get('p').length > 0) {
-            document.querySelector('#input-pattern').textContent = params.get('p')
+            document.querySelector('#input-pattern').textContent = decodeURIComponent(params.get('p'))
           }
         }
       }
