@@ -43,6 +43,7 @@
         box-sizing: border-box;
         border: none;
         position: relative;
+        overflow-wrap: normal;
       }
 
       .full-io {
@@ -50,7 +51,12 @@
       }
 
       .half-io {
-        width: 45%;
+        width: 48%;
+      }
+
+      .split-io {
+        display: flex;
+        justify-content: space-between;
       }
 
       .fixed-io {
@@ -60,8 +66,8 @@
       }
 
       [contenteditable=true]:empty:before {
-        content:attr(data-ph);
-        color:grey;
+        content: attr(data-ph);
+        color: grey;
         pointer-events: none;
       }
 
@@ -91,7 +97,7 @@
       <div class="fixed-io">
         <textarea id="input-split" class="io full-io" placeholder="Type text here"></textarea>
       </div>
-      <div class="fixed-io">
+      <div class="fixed-io split-io">
         <textarea id="output-pre" class="io half-io" placeholder="Prepended text here..." readonly></textarea>
         <textarea id="output-post" class="io half-io" placeholder="Text here..." readonly></textarea>
       </div>
