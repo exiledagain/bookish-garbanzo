@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf8">
     <title>Prepend Stripper</title>
-    <link rel="shortcut icon" type="image/png" href="/bookish-garbanzo/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
@@ -185,12 +184,24 @@
         document.querySelector('#output').value = text
       }
 
+      function UpdateParam (key, val) {
+        switch (key) {
+          case 'p':            
+            const params = new URLSearchParams(window.location.search)
+            if (typeof val !== 'string' || val.length === 0) {
+              params.delete(key)
+            } else {
+              params.set(key, encodeURIComponent(val))
+            }
+            window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}${window.location.hash}`)
+            break
+        }
+      }
+
       function SplitText () {
         const pattern = document.querySelector('#input-pattern').textContent
         const text = document.querySelector('#input-split').value
-        const params = new URLSearchParams(window.location.search)
-        params.set('p', encodeURIComponent(pattern))
-        window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}${window.location.hash}`)
+        UpdateParam('p', pattern)
         try {
           const parts = Strip(pattern, text)
           document.querySelector('#input-pattern').style.color = 'silver'
@@ -214,6 +225,7 @@
         document.querySelector('#input-merge').value = ''
         document.querySelector('#input-split').value = ''
         document.querySelector('#input-pattern').textContent = ''
+        UpdateParam('p', '')
       }
 
       function Setup () {
