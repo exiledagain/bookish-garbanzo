@@ -44,6 +44,8 @@
         border: none;
         position: relative;
         overflow-wrap: normal;
+        overflow-x: scroll;
+        white-space: pre;
       }
 
       .full-io {
@@ -83,6 +85,10 @@
       .minor-gap {
         margin-bottom: -2em;
       }
+
+      #input-pattern {
+        overflow-y: scroll;
+      }
     </style>
   </head>
   <body>
@@ -95,17 +101,17 @@
       </div>
       <div class="fixed-io" id="input-pattern" contenteditable="true" data-ph="Type pattern here"></div>
       <div class="fixed-io">
-        <textarea id="input-split" class="io full-io" placeholder="Type text here"></textarea>
+        <textarea id="input-split" class="io full-io" placeholder="Type text here" wrap="off"></textarea>
       </div>
       <div class="fixed-io split-io">
-        <textarea id="output-pre" class="io half-io" placeholder="Prepended text here..." readonly></textarea>
-        <textarea id="output-post" class="io half-io" placeholder="Text here..." readonly></textarea>
+        <textarea id="output-pre" class="io half-io" placeholder="Prepended text here..." wrap="off" readonly></textarea>
+        <textarea id="output-post" class="io half-io" placeholder="Text here..." wrap="off" readonly></textarea>
       </div>
       <div class="fixed-io">
-        <textarea id="input-merge" class="io full-io" placeholder="Type text here"></textarea>
+        <textarea id="input-merge" class="io full-io" placeholder="Type text here" wrap="off"></textarea>
       </div>
       <div class="fixed-io">
-        <textarea id="output" class="io full-io" placeholder="Enter text above..." readonly></textarea>
+        <textarea id="output" class="io full-io" placeholder="Enter text above..." wrap="off" readonly></textarea>
       </div>
     </div>
     <script>
